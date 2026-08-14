@@ -20,6 +20,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -27,19 +28,42 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Install Dependencies
-        run: npm ci
+      - name: Locate, Install & Build Angular
+        id: build
+        run: |
+          echo "=== Searching for package.json ==="
+          PKG_PATH=$(find . -name "package.json" -not -path "*/node_modules/*" | head -n 1)
+          
+          if [ -z "$PKG_PATH" ]; then
+            echo "❌ ERROR: package.json is missing from your repository!"
+            exit 1
+          fi
 
-      - name: Build Angular App
-        run: npx ng build --configuration production --base-href /${{ github.event.repository.name }}/
+          PROJECT_DIR=$(dirname "$PKG_PATH")
+          echo "✅ Found package.json in: $PROJECT_DIR"
+          cd "$PROJECT_DIR"
+
+          echo "=== Installing Dependencies ==="
+          npm install --legacy-peer-deps
+
+          echo "=== Building Angular App ==="
+          npx ng build --configuration production --base-href /${{ github.event.repository.name }}/
+
+          echo "=== Locating Build Output ==="
+          INDEX_PATH=$(find . -name "index.html" -not -path "*/node_modules/*" | head -n 1)
+          BUILD_DIR=$(dirname "$INDEX_PATH")
+          FULL_PATH="$PROJECT_DIR/$BUILD_DIR"
+          
+          echo "✅ Final output folder: $FULL_PATH"
+          echo "dist_path=$FULL_PATH" >> $GITHUB_OUTPUT
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/setu-frontend/browser
+          path: ${{ steps.build.outputs.dist_path }}
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4git commit -m "Update GitHub Actions workflow"
+        uses: actions/deploy-pages@v4
