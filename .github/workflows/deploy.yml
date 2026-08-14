@@ -20,6 +20,12 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    
+    # Tell GitHub to run build commands inside your subfolder
+    defaults:
+      run:
+        working-directory: ./employeemanagementsystem
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -35,20 +41,18 @@ jobs:
       - name: Build Angular App
         run: npx ng build --configuration production --base-href /${{ github.event.repository.name }}/
 
-      - name: Locate Output Directory
-        id: locate-dist
+      - name: Locate Build Output Folder
+        id: find-dist
+        working-directory: .
         run: |
-          echo "=== List dist directory ==="
-          ls -R dist
-          INDEX_PATH=$(find dist -type f -name "index.html" | head -n 1)
-          BUILD_DIR=$(dirname "$INDEX_PATH")
-          echo "Found build folder: $BUILD_DIR"
-          echo "dist_path=$BUILD_DIR" >> $GITHUB_OUTPUT
+          BUILD_DIR=$(dirname $(find . -name "index.html" | grep -v node_modules | head -n 1))
+          echo "Found Angular build output at: $BUILD_DIR"
+          echo "build_path=$BUILD_DIR" >> $GITHUB_OUTPUT
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ steps.locate-dist.outputs.dist_path }}
+          path: ${{ steps.find-dist.outputs.build_path }}
 
       - name: Deploy to GitHub Pages
         id: deployment
