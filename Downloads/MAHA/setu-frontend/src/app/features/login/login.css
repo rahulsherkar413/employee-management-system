@@ -1,0 +1,12 @@
+ .role-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.min-vh-80 {
+  min-height: 80vh;
+}

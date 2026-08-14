@@ -1,0 +1,113 @@
+ <!-- Navigation Header (Hidden on Login Page) -->
+<ng-container *ngIf="router.url !== '/login'">
+  <header class="bg-dark text-white py-2 border-bottom border-primary border-3 shadow-sm">
+    <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fs-3">🚩</span>
+        <div>
+          <h1 class="h5 mb-0 fw-bold text-uppercase tracking-wide">
+            {{ langService.translate('portalTitle') }} 
+            <span class="badge bg-warning text-dark fs-7 ms-2">PRO</span>
+          </h1>
+          <small class="text-secondary" style="font-size: 0.75rem;">{{ langService.translate('subTitle') }}</small>
+        </div>
+      </div>
+      
+      <div class="d-flex align-items-center gap-3">
+        <!-- Notification Bell Icon with Badge -->
+        <div class="position-relative">
+          <button (click)="toggleDrawer()" class="btn btn-outline-light btn-sm rounded-circle p-2 position-relative" title="SMS & WhatsApp Alerts">
+            <i class="bi bi-bell-fill fs-6"></i>
+            <span *ngIf="notifService.unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ notifService.unreadCount }}
+            </span>
+          </button>
+
+          <!-- Notification Drawer Dropdown -->
+          <div *ngIf="showDrawer" class="card shadow-lg position-absolute end-0 mt-2 z-3 text-dark border-0 rounded-3" style="width: 360px; max-height: 480px;">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2">
+              <span class="fw-bold fs-7">💬 Live Alerts (SMS & WhatsApp)</span>
+              <button (click)="toggleDrawer()" class="btn-close btn-close-white btn-sm"></button>
+            </div>
+
+            <!-- Action Toolbar for Quick Testing -->
+            <div class="bg-light p-2 border-bottom d-flex justify-content-between align-items-center">
+              <small class="text-muted fw-bold">Test Alerts:</small>
+              <div class="btn-group btn-group-sm">
+                <button (click)="triggerTestSMS()" class="btn btn-outline-secondary btn-sm">+ SMS</button>
+                <button (click)="triggerTestWhatsApp()" class="btn btn-outline-success btn-sm">+ WhatsApp</button>
+              </div>
+            </div>
+
+            <!-- Notification List -->
+            <div class="card-body p-0 overflow-auto" style="max-height: 350px;">
+              <div *ngIf="notifService.notifications.length === 0" class="p-4 text-center text-muted">
+                No alerts yet.
+              </div>
+
+              <div *ngFor="let notif of notifService.notifications" class="p-3 border-bottom d-flex gap-3 align-items-start hover-bg">
+                <!-- Icon based on type -->
+                <div>
+                  <span *ngIf="notif.type === 'whatsapp'" class="badge bg-success rounded-circle p-2">
+                    <i class="bi bi-whatsapp fs-6"></i>
+                  </span>
+                  <span *ngIf="notif.type === 'sms'" class="badge bg-info text-dark rounded-circle p-2">
+                    <i class="bi bi-chat-text-fill fs-6"></i>
+                  </span>
+                </div>
+
+                <!-- Message Body -->
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong class="fs-7 text-uppercase" [ngClass]="notif.type === 'whatsapp' ? 'text-success' : 'text-primary'">
+                      {{ notif.title }}
+                    </strong>
+                    <small class="text-muted fs-8">{{ notif.timestamp | date:'shortTime' }}</small>
+                  </div>
+                  <p class="mb-1 text-secondary fs-7 lh-sm">{{ notif.message }}</p>
+                  <small class="text-muted" style="font-size: 0.7rem;">Sent to: {{ notif.phone }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Language Switcher -->
+        <button (click)="toggleLang()" class="btn btn-outline-warning btn-sm rounded-pill px-3 fw-bold">
+          🌐 {{ langService.getCurrentLang() === 'en' ? 'मराठी' : 'English' }}
+        </button>
+
+        <!-- Sign Out -->
+        <a routerLink="/login" class="btn btn-outline-light btn-sm rounded-pill px-3">
+          <i class="bi bi-box-arrow-right me-1"></i> {{ langService.translate('signOut') }}
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container-fluid px-4">
+      <div class="navbar-nav d-flex flex-row gap-2 overflow-auto w-100 py-1">
+        <a class="nav-link px-3 py-2 rounded text-nowrap" routerLink="/application-entry" routerLinkActive="active bg-primary text-white fw-semibold">
+          <i class="bi bi-file-earmark-plus me-1"></i> {{ langService.translate('newApp') }}
+        </a>
+        <a class="nav-link px-3 py-2 rounded text-nowrap" routerLink="/track" routerLinkActive="active bg-primary text-white fw-semibold">
+          <i class="bi bi-search me-1"></i> {{ langService.translate('trackStatus') }}
+        </a>
+        <a class="nav-link px-3 py-2 rounded text-nowrap" routerLink="/receipt/SETU-982134" routerLinkActive="active bg-primary text-white fw-semibold">
+          <i class="bi bi-receipt me-1"></i> {{ langService.translate('receiptView') }}
+        </a>
+        <a class="nav-link px-3 py-2 rounded text-nowrap" routerLink="/certificate-issue" routerLinkActive="active bg-primary text-white fw-semibold">
+          <i class="bi bi-award me-1"></i> {{ langService.translate('officerApprovals') }}
+        </a>
+        <a class="nav-link px-3 py-2 rounded text-nowrap" routerLink="/dashboard" routerLinkActive="active bg-primary text-white fw-semibold">
+          <i class="bi bi-speedometer2 me-1"></i> {{ langService.translate('dashboard') }}
+        </a>
+      </div>
+    </div>
+  </nav>
+</ng-container>
+
+<main class="container-fluid px-4 py-4">
+  <router-outlet></router-outlet>
+</main>

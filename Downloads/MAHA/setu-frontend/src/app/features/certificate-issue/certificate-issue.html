@@ -1,0 +1,131 @@
+ <div class="container-fluid">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold text-dark mb-1">
+        <i class="bi bi-award text-primary me-2"></i> Officer Approval & Certificate Issue
+      </h3>
+      <p class="text-muted mb-0 small">Review incoming applications, verify documents, and apply Tahsildar Digital Signature (DSC).</p>
+    </div>
+    <div class="bg-light p-2 px-3 rounded border">
+      <small class="text-muted d-block">Officer Logged In:</small>
+      <strong class="text-primary"><i class="bi bi-person-badge me-1"></i> Sub-Divisional Magistrate / Tahsildar</strong>
+    </div>
+  </div>
+
+  <!-- Applications Review Table -->
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+      <h6 class="fw-bold mb-0">Pending Application Queue</h6>
+      <button (click)="refreshList()" class="btn btn-outline-secondary btn-sm rounded-pill">
+        <i class="bi bi-arrow-clockwise me-1"></i> Refresh Queue
+      </button>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>App ID</th>
+              <th>Applicant Name</th>
+              <th>Service Required</th>
+              <th>Speed</th>
+              <th>Fee Paid</th>
+              <th>Current Status</th>
+              <th class="text-end px-4">Officer Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let app of applications">
+              <td>
+                <span class="fw-bold text-primary">#{{ app.id }}</span>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ app.applicantName }}</div>
+                <small class="text-muted">Aadhaar: {{ app.aadhaarNo }}</small>
+              </td>
+              <td>{{ app.serviceType }}</td>
+              <td>
+                <span class="badge" [class.bg-warning]="app.deliveryType === 'Tatkal'" [class.text-dark]="app.deliveryType === 'Tatkal'" [class.bg-info]="app.deliveryType !== 'Tatkal'">
+                  {{ app.deliveryType || 'Standard' }}
+                </span>
+              </td>
+              <td>
+                <span class="text-success fw-bold">₹{{ app.feePaid || 50 }}.00</span>
+              </td>
+              <td>
+                <span class="badge rounded-pill" 
+                  [class.bg-warning]="app.status === 'Pending'"
+                  [class.text-dark]="app.status === 'Pending'"
+                  [class.bg-success]="app.status === 'Approved'"
+                  [class.bg-danger]="app.status === 'Rejected'">
+                  {{ app.status }}
+                </span>
+              </td>
+              <td class="text-end px-4">
+                <!-- If Pending: Show Approve / Reject Buttons -->
+                <div *ngIf="app.status === 'Pending'" class="btn-group btn-group-sm">
+                  <button 
+                    (click)="approveWithDsc(app)" 
+                    class="btn btn-success fw-semibold"
+                    [disabled]="isSigning && signingAppId === app.id">
+                    <span *ngIf="isSigning && signingAppId === app.id" class="spinner-border spinner-border-sm me-1"></span>
+                    <i *ngIf="!(isSigning && signingAppId === app.id)" class="bi bi-vector-pen me-1"></i>
+                    Sign & Approve
+                  </button>
+                  <button (click)="openRejectModal(app)" class="btn btn-outline-danger">
+                    Reject
+                  </button>
+                </div>
+
+                <!-- If Approved: Show Approved Status -->
+                <div *ngIf="app.status === 'Approved'">
+                  <span class="text-success small fw-bold">
+                    <i class="bi bi-shield-check me-1"></i> Digitally Signed
+                  </span>
+                </div>
+
+                <!-- If Rejected -->
+                <div *ngIf="app.status === 'Rejected'">
+                  <span class="text-danger small fw-bold">Rejected</span>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="applications.length === 0">
+              <td colspan="7" class="text-center py-4 text-muted">
+                No applications found in queue.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rejection Modal -->
+<div *ngIf="rejectAppId" class="modal-backdrop fade show"></div>
+<div *ngIf="rejectAppId" class="modal d-block tab-index='-1'">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title fw-bold">Reject Application #{{ rejectAppId }}</h5>
+        <button (click)="rejectAppId = null" class="btn-close btn-close-white"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label fw-semibold">Select / Enter Rejection Reason</label>
+        <select class="form-select mb-2" [(ngModel)]="rejectionReason">
+          <option value="Incomplete documentation provided.">Incomplete documentation provided.</option>
+          <option value="Income details mismatch in 7/12 extract.">Income details mismatch in 7/12 extract.</option>
+          <option value="Applicant address outside district jurisdiction.">Applicant address outside district jurisdiction.</option>
+        </select>
+      </div>
+      <div class="modal-footer bg-light">
+        <button (click)="rejectAppId = null" class="btn btn-secondary">Cancel</button>
+        <button (click)="confirmReject()" class="btn btn-danger fw-bold">Confirm Rejection</button>
+      </div>
+    </div>
+  </div>
+</div>

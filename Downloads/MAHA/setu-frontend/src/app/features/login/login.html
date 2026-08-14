@@ -1,0 +1,86 @@
+ <div class="container py-5">
+  <div class="row justify-content-center align-items-center min-vh-80">
+    <div class="col-lg-10 col-xl-9">
+      <div class="card border-0 shadow-lg overflow-hidden rounded-4">
+        <div class="row g-0">
+          
+          <div class="col-md-5 bg-dark text-white p-5 d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-4">
+                <span class="fs-2"></span>
+                <h2 class="h4 mb-0 fw-bold tracking-wide">MAHA SETU</h2>
+              </div>
+              <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3">Enterprise Suite</span>
+              <h3 class="fw-bold fs-4">Citizen Services Kiosk</h3>
+              <p class="text-white-50 mt-3 fs-6">Unified portal for fast-track verification, certificate issuance, and governance tracking.</p>
+            </div>
+
+            <div class="pt-4 border-top border-secondary">
+              <small class="text-white-50"><i class="bi bi-shield-lock-fill text-success me-1"></i> Encrypted Government Kiosk Portal</small>
+            </div>
+          </div>
+
+          <div class="col-md-7 p-5 bg-white">
+            <h4 class="fw-bold text-dark mb-1">Select Access Profile</h4>
+            <p class="text-muted small mb-4">Choose authorization profile to open session workspace.</p>
+
+            <div class="row g-2 mb-4">
+              <div class="col-4">
+                <div class="card text-center p-3 cursor-pointer role-card border-2" 
+                     [class.border-primary]="selectedRole === 'operator'"
+                     [class.bg-primary-subtle]="selectedRole === 'operator'"
+                     (click)="selectRole('operator')">
+                  <div class="fs-3 text-primary mb-1"><i class="bi bi-person-workspace"></i></div>
+                  <div class="fw-bold small">Operator</div>
+                </div>
+              </div>
+
+              <div class="col-4">
+                <div class="card text-center p-3 cursor-pointer role-card border-2" 
+                     [class.border-primary]="selectedRole === 'officer'"
+                     [class.bg-primary-subtle]="selectedRole === 'officer'"
+                     (click)="selectRole('officer')">
+                  <div class="fs-3 text-primary mb-1"><i class="bi bi-award-fill"></i></div>
+                  <div class="fw-bold small">Tahsildar</div>
+                </div>
+              </div>
+
+              <div class="col-4">
+                <div class="card text-center p-3 cursor-pointer role-card border-2" 
+                     [class.border-primary]="selectedRole === 'admin'"
+                     [class.bg-primary-subtle]="selectedRole === 'admin'"
+                     (click)="selectRole('admin')">
+                  <div class="fs-3 text-primary mb-1"><i class="bi bi-gear-wide-connected"></i></div>
+                  <div class="fw-bold small">Admin</div>
+                </div>
+              </div>
+            </div>
+
+            <form (ngSubmit)="onLogin()">
+              <div class="mb-3">
+                <label class="form-label fw-semibold small">User ID</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control" [(ngModel)]="username" name="username" required>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold small">Password PIN</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                  <input type="password" class="form-control" [(ngModel)]="password" name="password" required>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 py-2.5 fw-bold shadow-sm rounded-3">
+                Sign In to Portal <i class="bi bi-arrow-right-short fs-5 align-middle"></i>
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

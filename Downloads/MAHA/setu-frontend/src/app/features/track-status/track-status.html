@@ -1,0 +1,38 @@
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-4 text-center bg-primary text-white rounded-4">
+        <h3 class="fw-bold"><i class="bi bi-search me-2"></i> Track Citizen Application</h3>
+        <p class="mb-3 text-white-50">Enter Application ID printed on acknowledgment receipt.</p>
+        
+        <div class="input-group input-group-lg max-w-500 mx-auto">
+          <input type="text" class="form-control border-0" placeholder="e.g. SETU-982134" [(ngModel)]="searchId" (keyup.enter)="onSearch()">
+          <button class="btn btn-warning fw-bold px-4" (click)="onSearch()">Track Now</button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="hasSearched && foundApp" class="card border-0 shadow-sm rounded-4 p-4">
+      <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+        <div>
+          <h5 class="fw-bold mb-0 text-primary">{{ foundApp.id }}</h5>
+          <small class="text-muted">Applied: {{ foundApp.appliedDate }}</small>
+        </div>
+        <span class="badge fs-6 px-3 py-2 rounded-pill"
+              [class.bg-warning-subtle]="foundApp.status === 'Pending'" [class.text-warning-emphasis]="foundApp.status === 'Pending'"
+              [class.bg-success-subtle]="foundApp.status === 'Approved'" [class.text-success]="foundApp.status === 'Approved'">
+          {{ foundApp.status }}
+        </span>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-6"><strong>Applicant Name:</strong> {{ foundApp.applicantName }}</div>
+        <div class="col-6"><strong>Service:</strong> {{ foundApp.serviceType }}</div>
+      </div>
+    </div>
+
+    <div *ngIf="hasSearched && !foundApp" class="alert alert-danger text-center shadow-sm rounded-3">
+      No record found for ID: <strong>{{ searchId }}</strong>.
+    </div>
+  </div>
+</div>

@@ -1,0 +1,68 @@
+ <div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+      <div class="card-body p-4 bg-primary text-white rounded-3">
+        <h3 class="fw-bold mb-1">Citizen Application Registration</h3>
+        <p class="mb-0 opacity-75">Capture applicant details for instant verification and processing.</p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3">
+      <div class="card-body p-4">
+        <form (ngSubmit)="onSubmit()" #appForm="ngForm">
+          
+          <h5 class="text-primary fw-bold border-bottom pb-2 mb-3"><i class="bi bi-1-circle-fill me-2"></i> Certificate Category</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Service Type *</label>
+              <select class="form-select" [(ngModel)]="formData.serviceType" name="serviceType" required>
+                <option value="Income Certificate">Income Certificate (उत्पन्नाचा दाखला)</option>
+                <option value="Caste Certificate">Caste Certificate (जातीचा दाखला)</option>
+                <option value="Domicile Certificate">Domicile Certificate (रहिवासी दाखला)</option>
+                <option value="Non-Creamy Layer">Non-Creamy Layer Certificate</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Processing Speed</label>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn w-50" [class.btn-primary]="formData.deliveryType === 'Standard'" [class.btn-outline-secondary]="formData.deliveryType !== 'Standard'" (click)="formData.deliveryType = 'Standard'">Standard (₹50)</button>
+                <button type="button" class="btn w-50" [class.btn-warning]="formData.deliveryType === 'Tatkal'" [class.btn-outline-warning]="formData.deliveryType !== 'Tatkal'" (click)="formData.deliveryType = 'Tatkal'">⚡ Tatkal (₹100)</button>
+              </div>
+            </div>
+          </div>
+
+          <h5 class="text-primary fw-bold border-bottom pb-2 mb-3"><i class="bi bi-2-circle-fill me-2"></i> Applicant Identity</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Full Name *</label>
+              <input type="text" class="form-control" placeholder="Full name as per Aadhaar" [(ngModel)]="formData.applicantName" name="applicantName" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Aadhaar Number *</label>
+              <input type="text" class="form-control" placeholder="12 Digit Aadhaar" maxlength="12" [(ngModel)]="formData.aadhaarNo" name="aadhaarNo" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Mobile Number *</label>
+              <input type="tel" class="form-control" placeholder="10 Digit Mobile" maxlength="10" [(ngModel)]="formData.mobileNo" name="mobileNo" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Annual Family Income (₹)</label>
+              <input type="number" class="form-control" placeholder="e.g. 180000" [(ngModel)]="formData.incomeAmount" name="incomeAmount">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Full Residential Address</label>
+              <textarea class="form-control" rows="2" placeholder="House no, village, district..." [(ngModel)]="formData.address" name="address"></textarea>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end pt-3 border-top">
+            <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm" [disabled]="!appForm.form.valid">
+              Submit & Print Receipt <i class="bi bi-arrow-right ms-2"></i>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
