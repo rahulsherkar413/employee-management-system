@@ -20,11 +20,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    
-    # Tell GitHub to run build commands inside your subfolder
-    defaults:
-      run:
-        working-directory: ./employeemanagementsystem
 
     steps:
       - name: Checkout Code
@@ -35,24 +30,45 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Dependencies
-        run: npm install --legacy-peer-deps
-
-      - name: Build Angular App
-        run: npx ng build --configuration production --base-href /${{ github.event.repository.name }}/
-
-      - name: Locate Build Output Folder
-        id: find-dist
-        working-directory: .
+      - name: Locate, Install & Build Angular
+        id: build
         run: |
-          BUILD_DIR=$(dirname $(find . -name "index.html" | grep -v node_modules | head -n 1))
-          echo "Found Angular build output at: $BUILD_DIR"
-          echo "build_path=$BUILD_DIR" >> $GITHUB_OUTPUT
+          echo "=== Locating package.json ==="
+          PKG_PATH=$(find . -name "package.json" -not -path "*/node_modules/*" | head -n 1)
+
+          if [ -z "$PKG_PATH" ]; then
+            echo "❌ ERROR: package.json not found in repository!"
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$PKG_PATH")
+          echo "✅ Found package.json in: $PROJECT_DIR"
+          cd "$PROJECT_DIR"
+
+          echo "=== Installing Dependencies ==="
+          npm install --legacy-peer-deps
+
+          echo "=== Building Angular Project ==="
+          npx ng build --configuration production --base-href /${{ github.event.repository.name }}/
+
+          echo "=== Finding Built Output Folder ==="
+          INDEX_PATH=$(find dist -name "index.html" 2>/dev/null | head -n 1)
+
+          if [ -z "$INDEX_PATH" ]; then
+            echo "❌ ERROR: index.html not found inside dist folder after build!"
+            exit 1
+          fi
+
+          BUILD_DIR=$(dirname "$INDEX_PATH")
+          FULL_PATH="$PROJECT_DIR/$BUILD_DIR"
+
+          echo "✅ Dist folder located at: $FULL_PATH"
+          echo "dist_path=$FULL_PATH" >> $GITHUB_OUTPUT
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ steps.find-dist.outputs.build_path }}
+          path: ${{ steps.build.outputs.dist_path }}
 
       - name: Deploy to GitHub Pages
         id: deployment
