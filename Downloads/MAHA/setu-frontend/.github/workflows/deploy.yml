@@ -33,30 +33,32 @@ jobs:
       - name: Locate, Install & Build Angular
         id: build
         run: |
-          echo "=== Searching for package.json ==="
+          echo "=== Locating package.json ==="
           PKG_PATH=$(find . -name "package.json" -not -path "*/node_modules/*" | head -n 1)
-          
-          if [ -z "$PKG_PATH" ]; then
-            echo "❌ ERROR: package.json is missing from your repository!"
-            exit 1
-          fi
-
           PROJECT_DIR=$(dirname "$PKG_PATH")
-          echo "✅ Found package.json in: $PROJECT_DIR"
           cd "$PROJECT_DIR"
 
           echo "=== Installing Dependencies ==="
           npm install --legacy-peer-deps
 
-          echo "=== Building Angular App ==="
-          npx ng build --configuration production --base-href /${{ github.event.repository.name }}/
+          echo "=== Building Angular Project ==="
+          npx ng build --configuration production --base-href /employee-management-system/
 
-          echo "=== Locating Build Output ==="
-          INDEX_PATH=$(find . -name "index.html" -not -path "*/node_modules/*" | head -n 1)
+          echo "=== Handling Angular Output Folder ==="
+          INDEX_PATH=$(find dist -name "index.html" 2>/dev/null | head -n 1)
+
+          if [ -z "$INDEX_PATH" ]; then
+            echo "❌ ERROR: index.html not found inside dist folder!"
+            exit 1
+          fi
+
           BUILD_DIR=$(dirname "$INDEX_PATH")
-          FULL_PATH="$PROJECT_DIR/$BUILD_DIR"
           
-          echo "✅ Final output folder: $FULL_PATH"
+          # Copy index.html to 404.html for GitHub Pages fallback
+          cp "$BUILD_DIR/index.html" "$BUILD_DIR/404.html"
+
+          FULL_PATH="$PROJECT_DIR/$BUILD_DIR"
+          echo "✅ Dist output located at: $FULL_PATH"
           echo "dist_path=$FULL_PATH" >> $GITHUB_OUTPUT
 
       - name: Upload Artifact
